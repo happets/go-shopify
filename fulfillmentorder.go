@@ -174,7 +174,7 @@ func (s *FulfillmentOrderServiceOp) List(orderId int64, options interface{}) ([]
 // Get individual fulfillment order
 func (s *FulfillmentOrderServiceOp) Get(fulfillmentID int64, options interface{}) (*FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("fulfillment_orders", fulfillmentID)
-	path := fmt.Sprintf("%s/%d.json", prefix, fulfillmentID)
+	path := fmt.Sprintf("%s.json", prefix)
 	resource := new(FulfillmentOrderResource)
 	err := s.client.Get(path, resource, options)
 	return resource.FulfillmentOrder, err

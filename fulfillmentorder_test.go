@@ -1,12 +1,20 @@
 package goshopify
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/jarcoal/httpmock"
 	"reflect"
 	"testing"
-	"time"
 )
+
+func FulfillmentOrderTests(t *testing.T, fulfillmentOrder FulfillmentOrder) {
+	// Check that ID is assigned to the returned fulfillment
+	expectedInt := int64(255858046) // in fulfillmentorder.json fixture
+	if fulfillmentOrder.Id != expectedInt {
+		t.Errorf("FulfillmentOrder.ID returned %+v, expected %+v", fulfillmentOrder.Id, expectedInt)
+	}
+}
 
 func TestFulfillmentOrderList(t *testing.T) {
 	setup()
@@ -28,310 +36,104 @@ func TestFulfillmentOrderList(t *testing.T) {
 	}
 }
 
-// TODO
 func TestFulfillmentOrderGet(t *testing.T) {
-	type fields struct {
-		client *Client
+	setup()
+	defer teardown()
+
+	fixture := loadFixture("fulfillmentorder.json")
+	httpmock.RegisterResponder("GET", fmt.Sprintf("https://fooshop.myshopify.com/%s/fulfillment_orders/255858046.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, fixture))
+
+	fulfillmentOrderService := &FulfillmentOrderServiceOp{client: client}
+
+	fulfillment, err := fulfillmentOrderService.Get(255858046, nil)
+	if err != nil {
+		t.Errorf("FulfillmentOrder.Get returned error: %v", err)
 	}
-	type args struct {
-		fulfillmentID int64
-		options       interface{}
+
+	expected := FulfillmentOrderResource{}
+	err = json.Unmarshal(fixture, &expected)
+	if err != nil {
+		t.Errorf("json.Unmarshall returned error : %v", err)
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Get(tt.args.fulfillmentID, tt.args.options)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Get() got = %v, want %v", got, tt.want)
-			}
-		})
+
+	if !reflect.DeepEqual(fulfillment, expected.FulfillmentOrder) {
+		t.Errorf("FulfillmentOrder.Get returned %+v, expected %+v", fulfillment, expected)
 	}
 }
 
-// TODO
 func TestFulfillmentOrderCancel(t *testing.T) {
-	type fields struct {
-		client *Client
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/fulfillment_orders/1/cancel.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("fulfillmentorder.json")))
+
+	fulfillmentOrderService := &FulfillmentOrderServiceOp{client: client}
+
+	returnedFulfillment, err := fulfillmentOrderService.Cancel(1)
+	if err != nil {
+		t.Errorf("FulfillmentOrder.Cancel returned error: %v", err)
 	}
-	type args struct {
-		fulfillmentID int64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Cancel(tt.args.fulfillmentID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Cancel() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Cancel() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
+	FulfillmentOrderTests(t, *returnedFulfillment)
 }
 
-// TODO
 func TestFulfillmentOrderClose(t *testing.T) {
-	type fields struct {
-		client *Client
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/fulfillment_orders/1/close.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("fulfillmentorder.json")))
+
+	fulfillmentOrderService := &FulfillmentOrderServiceOp{client: client}
+
+	returnedFulfillment, err := fulfillmentOrderService.Close(1, "test")
+	if err != nil {
+		t.Errorf("FulfillmentOrder.Close returned error: %v", err)
 	}
-	type args struct {
-		fulfillmentID int64
-		message       string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Close(tt.args.fulfillmentID, tt.args.message)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Close() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Close() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
+	FulfillmentOrderTests(t, *returnedFulfillment)
 }
 
-// TODO
 func TestFulfillmentOrderHold(t *testing.T) {
-	type fields struct {
-		client *Client
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/fulfillment_orders/1/hold.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("fulfillmentorder.json")))
+
+	fulfillmentOrderService := &FulfillmentOrderServiceOp{client: client}
+
+	returnedFulfillment, err := fulfillmentOrderService.Hold(1, false, HoldReasonOutOfStock, "test")
+	if err != nil {
+		t.Errorf("FulfillmentOrder.Hold returned error: %v", err)
 	}
-	type args struct {
-		fulfillmentID int64
-		notify        bool
-		reason        FulfillmentOrderHoldReason
-		notes         string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Hold(tt.args.fulfillmentID, tt.args.notify, tt.args.reason, tt.args.notes)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Hold() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Hold() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
+	FulfillmentOrderTests(t, *returnedFulfillment)
 }
 
 // TODO
 func TestFulfillmentOrderMove(t *testing.T) {
-	type fields struct {
-		client *Client
-	}
-	type args struct {
-		fulfillmentID int64
-		moveRequest   FulfillmentOrderMoveRequest
-		options       interface{}
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrderMoveResource
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Move(tt.args.fulfillmentID, tt.args.moveRequest, tt.args.options)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Move() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Move() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Error("TestFulfillmentOrderMove is not implemented")
 }
 
 // TODO
 func TestFulfillmentOrderOpen(t *testing.T) {
-	type fields struct {
-		client *Client
-	}
-	type args struct {
-		fulfillmentID int64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Open(tt.args.fulfillmentID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Open() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Open() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Error("TestFulfillmentOrderOpen is not implemented")
 }
 
 // TODO
 func TestFulfillmentOrderReleaseHold(t *testing.T) {
-	type fields struct {
-		client *Client
-	}
-	type args struct {
-		fulfillmentID int64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.ReleaseHold(tt.args.fulfillmentID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ReleaseHold() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ReleaseHold() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Error("TestFulfillmentOrderReleaseHold is not implemented")
 }
 
 // TODO
 func TestFulfillmentOrderReschedule(t *testing.T) {
-	type fields struct {
-		client *Client
-	}
-	type args struct {
-		fulfillmentID int64
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *FulfillmentOrder
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			got, err := s.Reschedule(tt.args.fulfillmentID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Reschedule() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Reschedule() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	t.Error("TestFulfillmentOrderReschedule is not implemented")
 }
 
 // TODO
 func TestFulfillmentOrderSetDeadline(t *testing.T) {
-	type fields struct {
-		client *Client
-	}
-	type args struct {
-		fulfillmentIDs []int64
-		deadline       time.Time
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &FulfillmentOrderServiceOp{
-				client: tt.fields.client,
-			}
-			if err := s.SetDeadline(tt.args.fulfillmentIDs, tt.args.deadline); (err != nil) != tt.wantErr {
-				t.Errorf("SetDeadline() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	t.Error("TestFulfillmentOrderSetDeadline is not implemented")
 }
