@@ -115,7 +115,29 @@ func TestFulfillmentOrderHold(t *testing.T) {
 
 // TODO
 func TestFulfillmentOrderMove(t *testing.T) {
-	t.Error("TestFulfillmentOrderMove is not implemented")
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", fmt.Sprintf("https://fooshop.myshopify.com/%s/fulfillment_orders/1046000818/move.json", client.pathPrefix),
+		httpmock.NewBytesResponder(200, loadFixture("fulfillmentorder_move.json")))
+
+	fulfillmentOrderService := &FulfillmentOrderServiceOp{client: client}
+
+	req := FulfillmentOrderMoveRequest{
+		NewLocationId: 655441491,
+		LineItems: []FulfillmentOrderLineItemQuantity{
+			{Id: 1058737594, Quantity: 1},
+		},
+	}
+
+	result, err := fulfillmentOrderService.Move(1046000818, req, nil)
+	if err != nil {
+		t.Errorf("FulfillmentOrder.Move returned error: %v", err)
+	}
+	if result.MovedFulfillmentOrder.AssignedLocationId != 655441491 {
+		t.Errorf("FulfillmentOrder.Move result AssignedLocation is is %d, expected %d",
+			result.MovedFulfillmentOrder.AssignedLocationId, 655441491)
+	}
 }
 
 // TODO

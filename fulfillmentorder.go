@@ -162,7 +162,7 @@ func FulfillmentOrderPathPrefix(resource string, resourceID int64) string {
 	return fmt.Sprintf("%s/%d", resource, resourceID)
 }
 
-// List FulfillmentOrder items for an order
+// List gets FulfillmentOrder items for an order
 func (s *FulfillmentOrderServiceOp) List(orderId int64, options interface{}) ([]FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("orders", orderId)
 	path := fmt.Sprintf("%s/fulfillment_orders.json", prefix)
@@ -171,7 +171,7 @@ func (s *FulfillmentOrderServiceOp) List(orderId int64, options interface{}) ([]
 	return resource.FulfillmentOrders, err
 }
 
-// Get individual fulfillment order
+// Get gets an individual fulfillment order
 func (s *FulfillmentOrderServiceOp) Get(fulfillmentID int64, options interface{}) (*FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("fulfillment_orders", fulfillmentID)
 	path := fmt.Sprintf("%s.json", prefix)
@@ -180,7 +180,7 @@ func (s *FulfillmentOrderServiceOp) Get(fulfillmentID int64, options interface{}
 	return resource.FulfillmentOrder, err
 }
 
-// Cancel a fulfillment order
+// Cancel cancels a fulfillment order
 func (s *FulfillmentOrderServiceOp) Cancel(fulfillmentID int64) (*FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("fulfillment_orders", fulfillmentID)
 	path := fmt.Sprintf("%s/cancel.json", prefix)
@@ -189,7 +189,7 @@ func (s *FulfillmentOrderServiceOp) Cancel(fulfillmentID int64) (*FulfillmentOrd
 	return resource.FulfillmentOrder, err
 }
 
-// Close Marks a fulfillment order as incomplete with an optional message
+// Close marks a fulfillment order as incomplete with an optional message
 func (s *FulfillmentOrderServiceOp) Close(fulfillmentID int64, message string) (*FulfillmentOrder, error) {
 	type closeRequest struct {
 		Message string `json:"message,omitempty"`
@@ -204,7 +204,7 @@ func (s *FulfillmentOrderServiceOp) Close(fulfillmentID int64, message string) (
 	return resource.FulfillmentOrder, err
 }
 
-// Hold Applies a fulfillment hold on an open fulfillment order
+// Hold applies a fulfillment hold on an open fulfillment order
 func (s *FulfillmentOrderServiceOp) Hold(fulfillmentID int64, notify bool, reason FulfillmentOrderHoldReason, notes string) (*FulfillmentOrder, error) {
 	type holdRequest struct {
 		Reason         FulfillmentOrderHoldReason `json:"reason"`
@@ -228,7 +228,7 @@ func (s *FulfillmentOrderServiceOp) Hold(fulfillmentID int64, notify bool, reaso
 	return resource.FulfillmentOrder, err
 }
 
-// Open Marks the fulfillment order as open
+// Open marks the fulfillment order as open
 func (s *FulfillmentOrderServiceOp) Open(fulfillmentID int64) (*FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("fulfillment_orders", fulfillmentID)
 	path := fmt.Sprintf("%s/open.json", prefix)
@@ -237,7 +237,7 @@ func (s *FulfillmentOrderServiceOp) Open(fulfillmentID int64) (*FulfillmentOrder
 	return resource.FulfillmentOrder, err
 }
 
-// ReleaseHold Releases the fulfillment hold on a fulfillment order
+// ReleaseHold releases the fulfillment hold on a fulfillment order
 func (s *FulfillmentOrderServiceOp) ReleaseHold(fulfillmentID int64) (*FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("fulfillment_orders", fulfillmentID)
 	path := fmt.Sprintf("%s/release_hold.json", prefix)
@@ -246,7 +246,7 @@ func (s *FulfillmentOrderServiceOp) ReleaseHold(fulfillmentID int64) (*Fulfillme
 	return resource.FulfillmentOrder, err
 }
 
-// Reschedule Reschedules the fulfill_at time of a scheduled fulfillment order
+// Reschedule reschedules the fulfill_at time of a scheduled fulfillment order
 func (s *FulfillmentOrderServiceOp) Reschedule(fulfillmentID int64) (*FulfillmentOrder, error) {
 	prefix := FulfillmentOrderPathPrefix("fulfillment_orders", fulfillmentID)
 	path := fmt.Sprintf("%s/reschedule.json", prefix)
@@ -255,7 +255,7 @@ func (s *FulfillmentOrderServiceOp) Reschedule(fulfillmentID int64) (*Fulfillmen
 	return resource.FulfillmentOrder, err
 }
 
-// SetDeadline Sets deadline for fulfillment orders
+// SetDeadline sets deadline for fulfillment orders
 func (s *FulfillmentOrderServiceOp) SetDeadline(fulfillmentIDs []int64, deadline time.Time) error {
 	type deadlineRequest struct {
 		FulfillmentOrderIds []int64   `json:"fulfillment_order_ids"`
@@ -271,7 +271,7 @@ func (s *FulfillmentOrderServiceOp) SetDeadline(fulfillmentIDs []int64, deadline
 	return err
 }
 
-// Move Moves a fulfillment order to a new location
+// Move moves a fulfillment order to a new location
 func (s *FulfillmentOrderServiceOp) Move(fulfillmentID int64, moveRequest FulfillmentOrderMoveRequest, options interface{}) (*FulfillmentOrderMoveResource, error) {
 	type request struct {
 		FulfillmentOrder FulfillmentOrderMoveRequest `json:"fulfillment_order"`
